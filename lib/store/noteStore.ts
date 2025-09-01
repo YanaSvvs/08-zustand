@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { NoteSchema } from '@/types/note';
 
-const initialDraft = {
+const initialDraft: NoteSchema = {
   title: '',
   content: '',
   tag: 'Todo',

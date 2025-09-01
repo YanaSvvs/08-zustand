@@ -1,13 +1,37 @@
-import { FormValues, Note } from "@/types/note";
-import axios from "axios";
+import { FormValues, Note, NoteTag } from '@/types/note';
+import axios from 'axios';
 
 interface NotesHttpResponse {
   notes: Note[];
   totalPages: number;
 }
 
-export const fetchNotes = async (search: string, page: number, tag: string): Promise<NotesHttpResponse> => {
-  const params: { search?: string; tag?: string; page: number; perPage: number } = {
+export const getTags = async (): Promise<NoteTag[]> => {
+  const headers = {
+    Authorization: `Bearer ${process.env.NEXT_PUBLIC_NOTEHUB_TOKEN}`,
+  };
+
+  const response = await axios.get<NoteTag[]>(
+    'https://notehub-public.goit.study/api/tags',
+    { headers }
+  );
+
+  return response.data;
+};
+
+export const getNotes = async (
+  tag: NoteTag | 'all',
+  sort: 'asc' | 'desc',
+  search: string,
+  page: number
+): Promise<NotesHttpResponse> => {
+  const params: {
+    search?: string;
+    tag?: string;
+    page: number;
+    perPage: number;
+    sort?: 'asc' | 'desc';
+  } = {
     page,
     perPage: 12,
   };
@@ -16,8 +40,12 @@ export const fetchNotes = async (search: string, page: number, tag: string): Pro
     params.search = search;
   }
 
-  if (tag && tag !== 'All') {
+  if (tag && tag !== 'all') {
     params.tag = tag;
+  }
+
+  if (sort) {
+    params.sort = sort;
   }
 
   const headers = {
@@ -25,7 +53,7 @@ export const fetchNotes = async (search: string, page: number, tag: string): Pro
   };
 
   const response = await axios.get<NotesHttpResponse>(
-    "https://notehub-public.goit.study/api/notes",
+    'https://notehub-public.goit.study/api/notes',
     { params, headers }
   );
 

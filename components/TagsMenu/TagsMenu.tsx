@@ -1,62 +1,34 @@
-'use client';
+import { NoteTag } from '@/types/note';
+import { Dispatch, SetStateAction } from 'react';
+import css from './TagMenu.module.css';
 
-import { useEffect, useRef, useState } from 'react';
-import css from './TagsMenu.module.css';
-import Link from 'next/link';
-export default function TagsMenu() {
-  const categories = ['All', 'Work', 'Personal', 'Meeting', 'Shopping', 'Todo'];
-  const [isOpenMenu, setIsOpenMenu] = useState(false);
+interface TagMenuProps {
+  tags: NoteTag[];
+  activeTag: NoteTag | 'all';
+  onSelectTag: Dispatch<SetStateAction<NoteTag | 'all'>>;
+}
 
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const menuRef = useRef<HTMLUListElement>(null);
-
-  const toggleMenu = () => {
-    setIsOpenMenu(prev => !prev);
-  };
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        menuRef.current &&
-        !menuRef.current.contains(event.target as Node) &&
-        !buttonRef.current?.contains(event.target as Node)
-      ) {
-        setIsOpenMenu(false);
-      }
-    };
-
-    if (isOpenMenu) {
-      document.addEventListener('mousedown', handleClickOutside);
-    } else {
-      document.removeEventListener('mousedown', handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isOpenMenu]);
-  const handleLinkClick = () => {
-    setIsOpenMenu(false);
-  };
+const TagMenu: React.FC<TagMenuProps> = ({ tags, activeTag, onSelectTag }) => {
   return (
-    <div className={css.menuContainer}>
-      <button ref={buttonRef} onClick={toggleMenu} className={css.menuButton}>
-        {isOpenMenu ? 'Notes ▴' : 'Notes ▾'}
+    <div className={css.tagMenu}>
+      <button
+        key="all"
+        className={`${css.tagButton} ${activeTag === 'all' ? css.active : ''}`}
+        onClick={() => onSelectTag('all')}
+      >
+        All
       </button>
-      {isOpenMenu && (
-        <ul ref={menuRef} className={css.menuList}>
-          {categories.map(category => (
-            <li key={category} className={css.menuItem}>
-              <Link
-                href={`/notes/filter/${category}`}
-                className={css.menuLink}
-                onClick={handleLinkClick}
-              >
-                {category}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
+      {tags.map((tag) => (
+        <button
+          key={tag}
+          className={`${css.tagButton} ${activeTag === tag ? css.active : ''}`}
+          onClick={() => onSelectTag(tag)}
+        >
+          {tag}
+        </button>
+      ))}
     </div>
   );
-}
+};
+
+export default TagMenu;
