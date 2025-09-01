@@ -6,7 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getNotes, getTags } from '@/lib/api';
 import { useState } from 'react';
 import { NoteTag } from '@/types/note';
-import TagMenu from '@/components/TagsMenu/TagsMenu';
+import TagsMenu from '@/components/TagsMenu/TagsMenu';
 import Link from 'next/link';
 
 interface NotesClientProps {
@@ -82,7 +82,7 @@ const NotesClient: React.FC<NotesClientProps> = ({ initialTag = 'all' }) => {
             </select>
           </div>
         </div>
-        <TagMenu
+        <TagsMenu
           tags={tags}
           activeTag={activeTag}
           onSelectTag={setActiveTag}

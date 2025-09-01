@@ -1,14 +1,14 @@
 import { NoteTag } from '@/types/note';
 import { Dispatch, SetStateAction } from 'react';
-import css from './TagMenu.module.css';
+import css from './TagsMenu.module.css';
 
-interface TagMenuProps {
+interface TagsMenuProps {
   tags: NoteTag[];
   activeTag: NoteTag | 'all';
   onSelectTag: Dispatch<SetStateAction<NoteTag | 'all'>>;
 }
 
-const TagMenu: React.FC<TagMenuProps> = ({ tags, activeTag, onSelectTag }) => {
+const TagsMenu: React.FC<TagsMenuProps> = ({ tags, activeTag, onSelectTag }) => {
   return (
     <div className={css.tagMenu}>
       <button
@@ -31,4 +31,4 @@ const TagMenu: React.FC<TagMenuProps> = ({ tags, activeTag, onSelectTag }) => {
   );
 };
 
-export default TagMenu;
+export default TagsMenu;
