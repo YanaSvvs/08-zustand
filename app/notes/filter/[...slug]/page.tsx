@@ -6,17 +6,13 @@ import { getNotes } from '@/lib/api';
 import { Metadata } from 'next';
 import { NoteTag } from '@/types/note';
 
-interface NotesPageProps {
-  params: {
-    slug: string[];
-  };
-  searchParams: { [key: string]: string | string[] | undefined };
-}
-
 export async function generateMetadata({
   params,
   searchParams,
-}: NotesPageProps): Promise<Metadata> {
+}: {
+  params: { slug: string[] };
+  searchParams?: { [key: string]: string | string[] | undefined };
+}): Promise<Metadata> {
   const tag = (params.slug?.[0] || 'all') as NoteTag | 'all';
 
   return {
@@ -35,7 +31,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function NotesPage({ params }: NotesPageProps) {
+export default async function NotesPage({ params }: { params: { slug: string[] } }) {
   const queryClient = new QueryClient();
 
   const tag = (params.slug?.[0] || 'all') as NoteTag | 'all';
