@@ -1,11 +1,15 @@
 'use client';
 
 import { useNoteStore } from '@/lib/store/noteStore';
-import { NoteSchema } from '@/types/note';
+import { NoteSchema, NoteTag } from '@/types/note';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import css from './NoteForm.module.css';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createNote } from '@/lib/api';
+import css from './NoteForm.module.css';
+import toast from 'react-hot-toast';
+
+const tags: NoteTag[] = ['Todo', 'Work', 'Personal', 'Meeting', 'Shopping'];
 
 interface NoteFormProps {
   initialData?: NoteSchema;
@@ -13,6 +17,7 @@ interface NoteFormProps {
 
 const NoteForm = ({ initialData }: NoteFormProps) => {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { draft, setDraft, clearDraft } = useNoteStore();
 
   const [formData, setFormData] = useState<NoteSchema>({
@@ -23,28 +28,34 @@ const NoteForm = ({ initialData }: NoteFormProps) => {
   });
 
   useEffect(() => {
-    
-    if (draft.title || draft.content || draft.tag !== 'Todo') {
+    if (draft.title || draft.content || (draft.tag && draft.tag !== 'Todo')) {
       setFormData(draft);
     }
   }, [draft]);
 
+  const createNoteMutation = useMutation({
+    mutationFn: createNote,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notes'] });
+      clearDraft();
+      router.push('/notes');
+      toast.success('Note created successfully!');
+    },
+    onError: () => {
+      toast.error('Failed to create note.');
+    },
+  });
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    const updatedData = { ...formData, [name]: value };
+    const updatedData = { ...formData, [name]: value as NoteTag };
     setFormData(updatedData);
     setDraft(updatedData);
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    try {
-      await createNote(formData);
-      clearDraft();
-      router.push('/notes');
-    } catch (error) {
-      console.error('Failed to create note:', error);
-    }
+    createNoteMutation.mutate(formData);
   };
 
   const handleCancel = () => {
@@ -85,10 +96,11 @@ const NoteForm = ({ initialData }: NoteFormProps) => {
           onChange={handleChange}
           className={css.select}
         >
-          <option value="Todo">Todo</option>
-          <option value="Work">Work</option>
-          <option value="Personal">Personal</option>
-          <option value="Other">Other</option>
+          {tags.map((tag) => (
+            <option key={tag} value={tag}>
+              {tag}
+            </option>
+          ))}
         </select>
       </label>
 
@@ -96,8 +108,9 @@ const NoteForm = ({ initialData }: NoteFormProps) => {
         <button
           type="submit"
           className={css.button}
+          disabled={createNoteMutation.isPending}
         >
-          Save
+          {createNoteMutation.isPending ? 'Saving...' : 'Save'}
         </button>
         <button
           type="button"

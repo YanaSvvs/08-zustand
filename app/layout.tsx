@@ -12,6 +12,7 @@ const roboto = Roboto({
   style: ['normal', 'italic'],
   subsets: ['latin'],
   display: 'swap',
+  variable: '--font-roboto', 
 });
 
 export const metadata: Metadata = {
@@ -20,7 +21,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'NoteHub',
     description: 'A simple note-taking application built with Next.js',
-    url: 'https://notehub.vercel.app', // Замініть на ваш URL-адресу
+    url: 'https://notehub.vercel.app',
     images: ['https://ac.goit.global/fullstack/react/notehub-og-meta.jpg'],
   },
 };
@@ -35,7 +36,7 @@ export default function RootLayout({
   modal,
 }: RootLayoutProps) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${roboto.variable} ${inter.className}`}>
       <body className={roboto.className}>
         <TanStackProvider>
           <Header />
