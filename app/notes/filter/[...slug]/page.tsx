@@ -10,11 +10,12 @@ interface NotesPageProps {
   params: {
     slug: string[];
   };
-  searchParams?: { [key: string]: string | string[] | undefined };
+  searchParams: { [key: string]: string | string[] | undefined };
 }
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: NotesPageProps): Promise<Metadata> {
   const tag = (params.slug?.[0] || 'all') as NoteTag | 'all';
 
@@ -25,7 +26,11 @@ export async function generateMetadata({
       title: `NoteHub - Notes filtered by ${tag}`,
       description: `Browse notes related to the ${tag} tag.`,
       url: `https://08-zustand-alpha-peach.vercel.app/notes/filter/${tag}`,
-      images: ['https://ac.goit.global/fullstack/react/notehub-og-meta.jpg'],
+      images: [
+        {
+          url: 'https://ac.goit.global/fullstack/react/notehub-og-meta.jpg',
+        },
+      ],
     },
   };
 }
